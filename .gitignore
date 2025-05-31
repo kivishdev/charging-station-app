@@ -4,10 +4,10 @@ node_modules/
 backend/node_modules/
 backend/.env
 
-# Frontend (Vue.js - for Day 2
-#dist/
-#frontend/node_modules/
-#frontend/.env
+# Frontend (Vue.js - for Day 2)
+dist/
+frontend/node_modules/
+frontend/.env
 
 # General
 *.log
