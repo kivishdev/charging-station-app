@@ -1,6 +1,5 @@
 # Charging Station App
 
-
 ## Overview
 A full-stack application built with Node.js, Express, and MongoDB for managing charging stations. Includes user authentication (register/login) and CRUD operations for charging stations.
 
