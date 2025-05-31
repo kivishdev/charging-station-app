@@ -22,7 +22,20 @@ JWT_SECRET=your_jwt_secret_key
 6. Start the backend server: `npm run dev`
 7. Test APIs using Postman (e.g., `POST /api/auth/register`, `POST /api/stations`).
 
+
+### Setup Instructions(Frontend)
+1. Navigate to the frontend folder: `cd charging-station-app/frontend`
+2. Install dependencies: `npm install`
+3. Start the frontend server: `npm run dev`
+4. Open `http://localhost:5173` in your browser to access the app.
+5. Log in with an existing user (e.g., `test@example.com` with password `password123`) or register a new user via Postman.
+
 ## Day 1 Progress
 - [x] Backend setup with Node.js, Express, and MongoDB.
 - [x] User authentication APIs (register, login).
 - [x] Charging station CRUD APIs (create, read, update, delete).
+
+## Day 2 Progress
+- [x] Vue.js frontend setup with Vite and Vue Router (local setup).
+- [x] Login page with authentication (connects to backend `/api/auth/login`).
+- [x] Chargers page to list charging stations (connects to backend `/api/stations`).
