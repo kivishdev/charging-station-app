@@ -25,9 +25,13 @@ JWT_SECRET=your_jwt_secret_key
 ### Setup Instructions(Frontend)
 1. Navigate to the frontend folder: `cd charging-station-app/frontend`
 2. Install dependencies: `npm install`
+- Note: This will install required packages, including `axios`, `vue3-toastify` for notifications, and `leaflet` for the map view.
 3. Start the frontend server: `npm run dev`
 4. Open `http://localhost:5173` in your browser to access the app.
 5. Log in with an existing user (e.g., `test@example.com` with password `password123`) or register a new user via Postman.
+6. On the Chargers page, you can:
+- View stations in a table (List View) or on a map (Map View) using Leaflet.
+- Create, update, and delete charging stations directly in the app.
 
 ## Day 1 Progress
 - [x] Backend setup with Node.js, Express, and MongoDB.
@@ -38,3 +42,8 @@ JWT_SECRET=your_jwt_secret_key
 - [x] Vue.js frontend setup with Vite and Vue Router (local setup).
 - [x] Login page with authentication (connects to backend `/api/auth/login`).
 - [x] Chargers page to list charging stations (connects to backend `/api/stations`).
+
+## Day 3 Progress
+- [x] Integrated Map View using Leaflet to display charging stations with interactive markers.
+- [x] Added create, update, and delete functionality for charging stations in the frontend.
+- [x] Connected frontend to backend APIs for full CRUD operations.
