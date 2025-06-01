@@ -1,10 +1,8 @@
-Charging Station App
+## Charging Station App:
 Overview
 The Charging Station App is a full-stack web application built using Node.js, Express, MongoDB, and Vue.js. It allows users to manage electric vehicle charging stations by performing CRUD operations (Create, Read, Update, Delete) and visualizing stations on an interactive map. The app includes user authentication and a map-based location selection feature for adding new stations.
-This project is part of a 5-day development sprint, with features being added progressively each day.
 
 Tech Stack
-
 Backend: Node.js, Express, MongoDB (with Mongoose)
 Frontend: Vue.js (Vue 3), Vue Router, Axios, Leaflet (for maps), Vue3-Toastify (for notifications)
 Styling: Bootstrap (via CDN), Custom CSS
