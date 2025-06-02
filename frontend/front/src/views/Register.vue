@@ -1,8 +1,8 @@
 <template>
   <div class="login-container">
     <div class="login-box">
-      <h2>Login</h2>
-      <form @submit.prevent="login">
+      <h2>Register</h2>
+      <form @submit.prevent="register">
         <div class="mb-3">
           <label for="email" class="form-label">Email address</label>
           <input
@@ -26,11 +26,11 @@
           />
         </div>
         <button type="submit" class="btn btn-primary w-100" :disabled="loading">
-          {{ loading ? 'Logging in...' : 'Login' }}
+          {{ loading ? 'Registering...' : 'Register' }}
         </button>
       </form>
       <p class="mt-3 text-center">
-        Don't have an account? <router-link to="/register">Register here</router-link>
+        Already have an account? <router-link to="/">Login here</router-link>
       </p>
     </div>
   </div>
@@ -41,7 +41,7 @@ import axios from 'axios';
 import { toast } from 'vue3-toastify';
 
 export default {
-  name: 'LoginView',
+  name: 'RegisterView',
   data() {
     return {
       email: '',
@@ -49,35 +49,23 @@ export default {
       loading: false,
     };
   },
-  created() {
-    // Check for email query parameter and pre-fill the email field
-    const emailFromQuery = this.$route.query.email;
-    if (emailFromQuery) {
-      this.email = emailFromQuery;
-    }
-
-    // Show a toast message if coming from logout after registration
-    if (this.$route.query.from === 'logout' && emailFromQuery) {
-      toast.success('You have successfully registered! Please log in with your new credentials.');
-      // Clear the last registered email from localStorage to avoid showing the message again
-      localStorage.removeItem('lastRegisteredEmail');
-    }
-  },
   methods: {
-    async login() {
+    async register() {
       this.loading = true;
       try {
-        const response = await axios.post('http://localhost:5000/api/auth/login', {
+        const response = await axios.post('http://localhost:5000/api/auth/register', {
           email: this.email,
           password: this.password,
         });
         localStorage.setItem('token', response.data.token);
-        toast.success('Login successful! Redirecting...');
+        // Store the email temporarily to use on the login page after logout
+        localStorage.setItem('lastRegisteredEmail', this.email);
+        toast.success('Registration successful! Redirecting...');
         setTimeout(() => {
           this.$router.push('/chargers');
         }, 1000);
       } catch (error) {
-        toast.error(error.response?.data?.message || 'Login failed');
+        toast.error(error.response?.data?.message || 'Registration failed');
       } finally {
         this.loading = false;
       }

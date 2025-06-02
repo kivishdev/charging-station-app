@@ -2,7 +2,10 @@
   <div class="chargers-container">
     <!-- Header -->
     <header class="header-bar">
-      <h2>Charging Stations</h2>
+      <div>
+        <h2>Charging Stations</h2>
+        <p v-if="userEmail" class="greeting">Hey, {{ userEmail }}...</p>
+      </div>
       <button class="btn btn-danger logout-btn" @click="logout">Logout</button>
     </header>
 
@@ -25,49 +28,57 @@
       <!-- List View -->
       <div v-if="activeTab === 'list'">
         <!-- Create Station Form -->
-        <div class="create-form card mb-3">
+        <div class="create-form card mb-3 animate__animated animate__fadeIn">
           <div class="card-body">
             <h5 class="card-title">Add New Station</h5>
             <form @submit.prevent="createStation">
               <div class="row mb-3">
-                <div class="col">
-                  <input v-model="newStation.name" type="text" class="form-control" placeholder="Name" required />
+                <div class="col-md-4">
+                  <label class="form-label">Name</label>
+                  <input v-model="newStation.name" type="text" class="form-control" placeholder="Station Name" required />
                 </div>
-                <div class="col">
+                <div class="col-md-4">
+                  <label class="form-label">Latitude</label>
                   <input v-model="newStation.location.latitude" type="text" class="form-control" placeholder="Latitude" required />
                   <small v-if="createErrors.latitude" class="text-danger">{{ createErrors.latitude }}</small>
                 </div>
-                <div class="col">
+                <div class="col-md-4">
+                  <label class="form-label">Longitude</label>
                   <input v-model="newStation.location.longitude" type="text" class="form-control" placeholder="Longitude" required />
                   <small v-if="createErrors.longitude" class="text-danger">{{ createErrors.longitude }}</small>
                 </div>
               </div>
               <div class="row mb-3">
-                <div class="col">
+                <div class="col-md-4">
+                  <label class="form-label">Status</label>
                   <select v-model="newStation.status" class="form-control" required>
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
                   </select>
                 </div>
-                <div class="col">
-                  <input v-model.number="newStation.powerOutput" type="number" class="form-control" placeholder="Power Output (kW)" required />
+                <div class="col-md-4">
+                  <label class="form-label">Power Output (kW)</label>
+                  <input v-model.number="newStation.powerOutput" type="number" class="form-control" placeholder="Power Output" required />
                 </div>
-                <div class="col">
+                <div class="col-md-4">
+                  <label class="form-label">Connector Type</label>
                   <input v-model="newStation.connectorType" type="text" class="form-control" placeholder="Connector Type" required />
                 </div>
               </div>
               <div class="row mb-3">
                 <div class="col">
-                  <button type="button" class="btn btn-info w-100" @click="startSelectingLocation">Select Location on Map</button>
+                  <button type="button" class="btn btn-info w-100 btn-animate" @click="startSelectingLocation">Select Location on Map</button>
                 </div>
               </div>
-              <button type="submit" class="btn btn-primary w-100" :disabled="creating">Add Station</button>
+              <button type="submit" class="btn btn-primary w-100 btn-animate" :disabled="creating">
+                {{ creating ? 'Adding Station...' : 'Add Station' }}
+              </button>
             </form>
           </div>
         </div>
 
         <!-- Stations Table -->
-        <table class="table table-bordered chargers-table">
+        <table class="table table-bordered chargers-table animate__animated animate__fadeIn">
           <thead>
             <tr>
               <th>Name</th>
@@ -86,16 +97,16 @@
               <td>{{ station.powerOutput }}</td>
               <td>{{ station.connectorType }}</td>
               <td>
-                <button class="btn btn-warning btn-sm me-2" @click="editStation(station)">Edit</button>
-                <button class="btn btn-danger btn-sm" @click="deleteStation(station._id)">Delete</button>
+                <button class="btn btn-warning btn-sm me-2 btn-animate" @click="editStation(station)">Edit</button>
+                <button class="btn btn-danger btn-sm btn-animate" @click="deleteStation(station._id)">Delete</button>
               </td>
             </tr>
           </tbody>
         </table>
 
         <!-- Edit Station Modal -->
-        <div v-if="editingStation" class="modal" style="display: block; background: rgba(0,0,0,0.5); position: fixed; top: 0; left: 0; right: 0; bottom: 0;">
-          <div class="modal-dialog" style="margin: 100px auto;">
+        <div v-if="editingStation" class="modal fade show d-block" style="background: rgba(0,0,0,0.5);">
+          <div class="modal-dialog modal-dialog-centered animate__animated animate__zoomIn">
             <div class="modal-content">
               <div class="modal-header">
                 <h5 class="modal-title">Edit Station</h5>
@@ -132,8 +143,10 @@
                     <label class="form-label">Connector Type</label>
                     <input v-model="editingStation.connectorType" type="text" class="form-control" required />
                   </div>
-                  <button type="submit" class="btn btn-primary" :disabled="updating">Update</button>
-                  <button type="button" class="btn btn-secondary ms-2" @click="editingStation = null">Cancel</button>
+                  <button type="submit" class="btn btn-primary btn-animate" :disabled="updating">
+                    {{ updating ? 'Updating...' : 'Update' }}
+                  </button>
+                  <button type="button" class="btn btn-secondary ms-2 btn-animate" @click="editingStation = null">Cancel</button>
                 </form>
               </div>
             </div>
@@ -143,14 +156,14 @@
 
       <!-- Map View -->
       <div v-if="activeTab === 'map'" class="map-container">
-        <div v-if="stations.length === 0 && !selectingLocation" class="no-stations">
+        <div v-if="stations.length === 0 && !selectingLocation" class="no-stations animate__animated animate__fadeIn">
           <p>No charging stations to display on the map.</p>
         </div>
         <div v-else>
-          <div v-if="selectingLocation" class="location-selection-message">
+          <div v-if="selectingLocation" class="location-selection-message animate__animated animate__fadeIn">
             <p>Click on the map to select the location for the new station.</p>
-            <button class="btn btn-success me-2" @click="confirmLocation" :disabled="!tempLocation">Confirm Location</button>
-            <button class="btn btn-secondary" @click="cancelSelectingLocation">Cancel</button>
+            <button class="btn btn-success me-2 btn-animate" @click="confirmLocation" :disabled="!tempLocation">Confirm Location</button>
+            <button class="btn btn-secondary btn-animate" @click="cancelSelectingLocation">Cancel</button>
           </div>
           <div id="map" style="height: 500px; border-radius: 5px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);"></div>
         </div>
@@ -168,6 +181,7 @@ export default {
   name: 'ChargersView',
   data() {
     return {
+      userEmail: '', // New property to store the user's email
       stations: [],
       loading: false,
       activeTab: 'list',
@@ -225,6 +239,9 @@ export default {
     if (!localStorage.getItem('token')) {
       this.$router.push('/');
     } else {
+      // Fetch user details
+      await this.fetchUserDetails();
+      // Fetch stations
       await this.fetchStations();
     }
   },
@@ -237,6 +254,20 @@ export default {
     }
   },
   methods: {
+    async fetchUserDetails() {
+      try {
+        const response = await axios.get('http://localhost:5000/api/auth/me', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        this.userEmail = response.data.email;
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+        toast.error('Failed to fetch user details');
+        this.$router.push('/');
+      }
+    },
     async fetchStations() {
       this.loading = true;
       try {
@@ -317,11 +348,9 @@ export default {
       });
 
       if (this.markers.length > 0) {
-        // Calculate the center of all markers
         const avgLat = this.stations.reduce((sum, station) => sum + parseFloat(station.location.latitude), 0) / this.stations.length;
         const avgLng = this.stations.reduce((sum, station) => sum + parseFloat(station.location.longitude), 0) / this.stations.length;
         const center = [avgLat, avgLng];
-        // Set zoom to level 6 to show a regional view
         this.map.setView(center, 6);
       }
     },
@@ -476,8 +505,13 @@ export default {
       }
     },
     logout() {
+      const lastEmail = localStorage.getItem('lastRegisteredEmail');
       localStorage.removeItem('token');
-      this.$router.push('/');
+      if (lastEmail) {
+        this.$router.push({ path: '/', query: { email: lastEmail, from: 'logout' } });
+      } else {
+        this.$router.push('/');
+      }
     },
   },
 };
@@ -503,9 +537,15 @@ export default {
 }
 
 h2 {
-  margin: 0;
+  margin:0;
   font-size: 1.5rem;
   font-weight: 600;
+}
+
+.greeting {
+  margin: 5px 0 0 0;
+  font-size: 1rem;
+  font-weight: 400;
 }
 
 .logout-btn {
@@ -513,23 +553,29 @@ h2 {
   border: none;
   padding: 8px 20px;
   font-weight: 500;
-  transition: background 0.3s;
+  transition: transform 0.1s ease, background 0.3s;
 }
 
 .logout-btn:hover {
   background: #c82333;
+  transform: scale(1.05);
 }
 
 .nav-tabs .nav-link {
   color: #6e8efb;
   font-weight: 500;
   border-radius: 5px 5px 0 0;
+  transition: background 0.3s;
 }
 
 .nav-tabs .nav-link.active {
   background: #6e8efb;
   color: white;
   border-color: #6e8efb;
+}
+
+.nav-tabs .nav-link:hover {
+  background: #e9ecef;
 }
 
 .loading-spinner {
@@ -564,6 +610,24 @@ h2 {
 .create-form .card-title {
   color: #6e8efb;
   font-weight: 600;
+}
+
+.form-label {
+  color: #333;
+  font-weight: 500;
+}
+
+.form-control {
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-control:focus {
+  border-color: #6e8efb;
+  box-shadow: 0 0 5px rgba(110, 142, 251, 0.3);
+  outline: none;
 }
 
 .chargers-table {
@@ -659,5 +723,61 @@ h2 {
   display: block;
   margin-top: 5px;
   font-size: 0.875rem;
+}
+
+.btn-animate {
+  transition: transform 0.1s ease, background 0.3s;
+}
+
+.btn-animate:hover {
+  transform: scale(1.03);
+}
+
+.btn-primary.btn-animate:disabled,
+.btn-success.btn-animate:disabled {
+  background: #a6b8ff;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .chargers-container {
+    padding: 10px;
+  }
+
+  .header-bar {
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 15px;
+  }
+
+  .greeting {
+    font-size: 0.9rem;
+  }
+
+  .create-form .card-body {
+    padding: 15px;
+  }
+
+  .form-label {
+    font-size: 0.9rem;
+  }
+
+  .form-control {
+    padding: 8px;
+  }
+
+  .chargers-table th,
+  .chargers-table td {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+
+  .modal-dialog {
+    margin: 20px;
+  }
+
+  #map {
+    height: 400px;
+  }
 }
 </style>
