@@ -117,7 +117,7 @@ Map-selected coordinates bypass frontend validation errors since they are guaran
 
 
 Development Log:
-Day 1
+# Day 1
 
 Set up the project structure with separate backend and frontend directories.
 Implemented the backend API with Express and MongoDB:
@@ -127,14 +127,14 @@ Routes for CRUD operations on charging stations (/api/stations).
 
 Added basic user authentication with JWT.
 
-Day 2
+# Day 2
 
 Set up the Vue.js frontend with Vue Router.
 Implemented the login page and basic navigation.
 Created the ChargersView component with List View to display stations in a table.
 Added CRUD functionality (Create, Read, Update, Delete) for stations in List View.
 
-Day 3
+# Day 3
 
 Added the Map View tab using Leaflet to display stations as markers.
 Implemented the "Select Location on Map" feature for creating new stations (see Features section above).
@@ -148,6 +148,12 @@ Initial zoom set to 3 (continent view) when the map first loads.
 After adding stations, the map zooms to level 6 (regional view) while centering on the markers.
 
 
-Contributing
+## Day 4:
+Added user registration functionality to the frontend:
+Created a Register.vue component in frontend/src/views/Register.vue with a form to register new users, integrated with the existing /api/auth/register backend endpoint.
+Updated frontend/src/router/index.js to include the /register route.
+Updated the login page (frontend/src/views/LoginView.vue) to include a link to the registration page, and added a link in Register.vue to navigate back to the login page.
+
+## Contributing:
 This is a personal project for learning purposes. Contributions are not expected, but feel free to fork the repository and experiment!
 
