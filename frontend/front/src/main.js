@@ -6,7 +6,7 @@ import 'vue3-toastify/dist/index.css';
 import 'leaflet/dist/leaflet.css'; // Add this line
 import axios from 'axios';
 
-axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+axios.defaults.baseURL = import.meta.env.VUE_APP_API_BASE_URL;
 
 const app = createApp(App);
 app.use(router);

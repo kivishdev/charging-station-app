@@ -103,7 +103,7 @@ export default {
       this.loading = true;
       try {
         // Use this instead:
-        const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/register`, {
+        const response = await axios.post(`${import.meta.env.VUE_API_BASE_URL}/api/auth/register`, {
           email: this.email.trim(),
           password: this.password,
         });
