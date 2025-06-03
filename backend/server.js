@@ -17,7 +17,10 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'https://charging-front-uejq.onrender.com',
+  credentials: true,
+}));
 app.use(express.json()); // This is crucial for parsing JSON bodies
 
 // Routes
