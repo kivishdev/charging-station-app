@@ -27,9 +27,8 @@ Navigate to the backend directory:
 cd backend
 
 
-Install dependencies:
+# Install dependencies:
 npm install
-
 
 Create a .env file in the backend directory with the following content:
 MONGODB_URI=mongodb://localhost:27017/chargingstationdb
@@ -65,11 +64,8 @@ Access the App:
 
 Open your browser and go to http://localhost:5173.
 Log in with the default user:
-Email: test@example.com
-Password: password123
 
-
-Features
+# Features
 Authentication
 
 Login: Users can log in with their email and password. A JWT token is stored in localStorage for session management.
@@ -81,28 +77,21 @@ List View:
 Displays all charging stations in a table with columns for Name, Location (latitude, longitude), Status, Power Output, Connector Type, and Actions.
 Actions include Edit and Delete for each station.
 
-
 Create Station:
 Users can add a new station by filling out a form with fields for Name, Latitude, Longitude, Status, Power Output, and Connector Type.
 Frontend validation ensures latitude is between -90 and 90, and longitude is between -180 and 180.
 
-
 Edit Station:
 Users can edit an existing station via a modal form, with the same fields and validation as the create form.
 
-
 Delete Station:
 Users can delete a station with a confirmation prompt.
-
 
 
 Map View:
 Interactive Map:
 Displays all charging stations as markers on a Leaflet map using OpenStreetMap tiles.
 Markers include popups with station details (Name, Location, Status, Power Output, Connector Type).
-The map initially loads at zoom level 3 (continent view) when there are no stations.
-After adding stations, the map centers on the average coordinates of all stations and sets the zoom to level 6 (regional view).
-
 
 ## New
 Select Location on Map:
@@ -111,20 +100,14 @@ In the create form, users can click a "Select Location on Map" button to switch 
 Users can click anywhere on the map to place a temporary red marker, and the map zooms to level 10 (street view) at the clicked location.
 Clicking "Confirm Location" populates the Latitude and Longitude fields in the create form with the clicked coordinates and switches back to List View.
 Users can then fill out the remaining fields and submit the form to create the station.
-A "Cancel" button allows users to abort the location selection and return to List View.
-Map-selected coordinates bypass frontend validation errors since they are guaranteed to be valid (within -90 to 90 for latitude, -180 to 180 for longitude).
 
-
-
-Development Log:
+# Development Log:
 # Day 1
 
 Set up the project structure with separate backend and frontend directories.
 Implemented the backend API with Express and MongoDB:
 Routes for user authentication (/api/auth/login).
 Routes for CRUD operations on charging stations (/api/stations).
-
-
 Added basic user authentication with JWT.
 
 # Day 2
@@ -142,7 +125,6 @@ Added frontend validation for latitude and longitude to match backend rules (lat
 Fixed bugs:
 Removed range validator from latitude/longitude inputs (changed to type="text").
 Fixed Map View rendering issue on second visit by properly reinitializing the map.
-
 Adjusted Map View zoom levels:
 Initial zoom set to 3 (continent view) when the map first loads.
 After adding stations, the map zooms to level 6 (regional view) while centering on the markers.
@@ -150,9 +132,15 @@ After adding stations, the map zooms to level 6 (regional view) while centering 
 
 ## Day 4:
 Added user registration functionality to the frontend:
-Created a Register.vue component in frontend/src/views/Register.vue with a form to register new users, integrated with the existing /api/auth/register backend endpoint.
-Updated frontend/src/router/index.js to include the /register route.
-Updated the login page (frontend/src/views/LoginView.vue) to include a link to the registration page, and added a link in Register.vue to navigate back to the login page.
+Created a Register.vue component with a form to register new users, integrated with the existing backend endpoint.
+Updated to include the /register route.
+Updated the login page to include a link to the registration page, and added a link in Register.vue to navigate back to the login page.
+
+# Day 5
+Improved the UI according to modern layouts.
+Faced all the backend API's not working on Day 4 so Removed all the errors and make sure they run as intented.
+Added Filters for the ChargingStations.
+Removed the Autofill via localstorage that used to happen in login and registers pages.
 
 ## Contributing:
 This is a personal project for learning purposes. Contributions are not expected, but feel free to fork the repository and experiment!
