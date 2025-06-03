@@ -17,11 +17,30 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors({
-  origin: 'https://charging-front-uejq.onrender.com',
+// Define allowed origins
+const allowedOrigins = [
+  'https://charging-front-uejq.onrender.com',
+  'http://localhost:5000' // Add other development origins as needed
+];
+
+// CORS configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      callback(new Error(msg), false);
+    }
+  },
   credentials: true,
-}));
-app.use(express.json()); // This is crucial for parsing JSON bodies
+};
+
+app.use(cors(corsOptions));
+app.use(express.json()); // For parsing JSON bodies
 
 // Routes
 app.use('/api/auth', authRoutes);

@@ -99,10 +99,11 @@ export default {
       if (!this.validateForm()) {
         return;
       }
-
+ 
       this.loading = true;
       try {
-        const response = await axios.post('http://localhost:5000/api/auth/register', {
+        // Use this instead:
+        const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/register`, {
           email: this.email.trim(),
           password: this.password,
         });

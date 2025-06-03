@@ -669,7 +669,7 @@ export default {
     async fetchStations() {
       this.loading = true;
       try {
-        const response = await axios.get('http://localhost:5000/api/stations', {
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/stations`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -703,7 +703,7 @@ export default {
             longitude: parseFloat(this.newStation.location.longitude),
           },
         };
-        await axios.post('http://localhost:5000/api/stations', stationData, {
+        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/stations`, stationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -747,7 +747,7 @@ export default {
             longitude: parseFloat(this.editingStation.location.longitude),
           },
         };
-        await axios.put(`http://localhost:5000/api/stations/${this.editingStation._id}`, stationData, {
+        await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/stations/${this.editingStation._id}`, stationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -775,7 +775,7 @@ export default {
         return;
       }
       try {
-        await axios.delete(`http://localhost:5000/api/stations/${stationId}`, {
+        await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/stations/${stationId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
