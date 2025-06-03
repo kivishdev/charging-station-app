@@ -23,6 +23,18 @@
             id="password"
             placeholder="Enter your password"
             required
+            minlength="6"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="confirmPassword" class="form-label">Confirm Password</label>
+          <input
+            v-model="confirmPassword"
+            type="password"
+            class="form-control"
+            id="confirmPassword"
+            placeholder="Confirm your password"
+            required
           />
         </div>
         <button type="submit" class="btn btn-primary w-100" :disabled="loading">
@@ -46,26 +58,80 @@ export default {
     return {
       email: '',
       password: '',
+      confirmPassword: '',
       loading: false,
     };
   },
   methods: {
+    validateForm() {
+      // Check if all fields are filled
+      if (!this.email.trim() || !this.password.trim() || !this.confirmPassword.trim()) {
+        toast.error('Please fill in all fields');
+        return false;
+      }
+
+      // Validate email format (basic validation)
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(this.email.trim())) {
+        toast.error('Please enter a valid email address');
+        return false;
+      }
+
+      // Check password length
+      if (this.password.length < 6) {
+        toast.error('Password must be at least 6 characters long');
+        return false;
+      }
+
+      // Check if passwords match
+      if (this.password !== this.confirmPassword) {
+        toast.error('Passwords do not match');
+        return false;
+      }
+
+      return true;
+    },
+
     async register() {
+      // Validate form before proceeding
+      if (!this.validateForm()) {
+        return;
+      }
+
       this.loading = true;
       try {
         const response = await axios.post('http://localhost:5000/api/auth/register', {
-          email: this.email,
+          email: this.email.trim(),
           password: this.password,
         });
-        localStorage.setItem('token', response.data.token);
-        // Store the email temporarily to use on the login page after logout
-        localStorage.setItem('lastRegisteredEmail', this.email);
-        toast.success('Registration successful! Redirecting...');
-        setTimeout(() => {
-          this.$router.push('/chargers');
-        }, 1000);
+
+        // Check if registration was successful
+        if (response.status === 200 || response.status === 201) {
+          toast.success('Registration successful! Redirecting to login...');
+          
+          // Clear form data
+          this.email = '';
+          this.password = '';
+          this.confirmPassword = '';
+
+          this.$nextTick(() => {
+            setTimeout(() => {
+              this.$router.push('/');
+            }, 1500);
+          });
+        } else {
+          throw new Error('Registration failed');
+        }
       } catch (error) {
-        toast.error(error.response?.data?.message || 'Registration failed');
+        // Better error handling
+        const errorMessage = error.response?.data?.message || 
+                           error.message || 
+                           'Registration failed. Please try again.';
+        toast.error(errorMessage);
+        
+        // Clear passwords on error for security
+        this.password = '';
+        this.confirmPassword = '';
       } finally {
         this.loading = false;
       }
@@ -103,6 +169,9 @@ h2 {
 .form-label {
   color: #333;
   font-weight: 500;
+  display: block;
+  text-align: left;
+  margin-bottom: 5px;
 }
 
 .form-control {
@@ -110,6 +179,8 @@ h2 {
   border: 1px solid #ddd;
   padding: 10px;
   transition: border-color 0.3s;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-control:focus {
@@ -118,15 +189,25 @@ h2 {
   outline: none;
 }
 
+.mb-3 {
+  margin-bottom: 1rem;
+}
+
 .btn-primary {
   background: #6e8efb;
   border: none;
   padding: 10px;
   font-weight: 500;
   transition: background 0.3s;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.btn-primary:hover {
+.w-100 {
+  width: 100%;
+}
+
+.btn-primary:hover:not(:disabled) {
   background: #5a7af8;
 }
 
@@ -135,8 +216,17 @@ h2 {
   cursor: not-allowed;
 }
 
+.mt-3 {
+  margin-top: 1rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
 p {
   color: #666;
+  margin: 0;
 }
 
 a {

@@ -2,7 +2,7 @@
   <div class="login-container">
     <div class="login-box">
       <h2>Login</h2>
-      <form @submit.prevent="login">
+      <form @submit.prevent="login" autocomplete="off" novalidate>
         <div class="mb-3">
           <label for="email" class="form-label">Email address</label>
           <input
@@ -11,6 +11,10 @@
             class="form-control"
             id="email"
             placeholder="Enter your email"
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
             required
           />
         </div>
@@ -22,6 +26,10 @@
             class="form-control"
             id="password"
             placeholder="Enter your password"
+            autocomplete="new-password"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
             required
           />
         </div>
@@ -49,35 +57,44 @@ export default {
       loading: false,
     };
   },
-  created() {
-    // Check for email query parameter and pre-fill the email field
-    const emailFromQuery = this.$route.query.email;
-    if (emailFromQuery) {
-      this.email = emailFromQuery;
-    }
-
-    // Show a toast message if coming from logout after registration
-    if (this.$route.query.from === 'logout' && emailFromQuery) {
-      toast.success('You have successfully registered! Please log in with your new credentials.');
-      // Clear the last registered email from localStorage to avoid showing the message again
-      localStorage.removeItem('lastRegisteredEmail');
-    }
-  },
   methods: {
     async login() {
+      // Validate inputs before making request
+      if (!this.email.trim() || !this.password.trim()) {
+        toast.error('Please fill in all fields');
+        return;
+      }
+
       this.loading = true;
       try {
         const response = await axios.post('http://localhost:5000/api/auth/login', {
-          email: this.email,
+          email: this.email.trim(),
           password: this.password,
         });
-        localStorage.setItem('token', response.data.token);
-        toast.success('Login successful! Redirecting...');
-        setTimeout(() => {
-          this.$router.push('/chargers');
-        }, 1000);
+
+        // Check if response contains token
+        if (response.data && response.data.token) {
+          localStorage.setItem('token', response.data.token);
+          toast.success('Login successful! Redirecting...');
+          
+          // Use nextTick to ensure DOM updates before navigation
+          this.$nextTick(() => {
+            setTimeout(() => {
+              this.$router.push('/chargers');
+            }, 1000);
+          });
+        } else {
+          throw new Error('Invalid response from server');
+        }
       } catch (error) {
-        toast.error(error.response?.data?.message || 'Login failed');
+        // Better error handling
+        const errorMessage = error.response?.data?.message || 
+                           error.message || 
+                           'Login failed. Please try again.';
+        toast.error(errorMessage);
+        
+        // Clear password on error for security
+        this.password = '';
       } finally {
         this.loading = false;
       }
@@ -115,6 +132,9 @@ h2 {
 .form-label {
   color: #333;
   font-weight: 500;
+  display: block;
+  text-align: left;
+  margin-bottom: 5px;
 }
 
 .form-control {
@@ -122,6 +142,8 @@ h2 {
   border: 1px solid #ddd;
   padding: 10px;
   transition: border-color 0.3s;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-control:focus {
@@ -130,15 +152,25 @@ h2 {
   outline: none;
 }
 
+.mb-3 {
+  margin-bottom: 1rem;
+}
+
 .btn-primary {
   background: #6e8efb;
   border: none;
   padding: 10px;
   font-weight: 500;
   transition: background 0.3s;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.btn-primary:hover {
+.w-100 {
+  width: 100%;
+}
+
+.btn-primary:hover:not(:disabled) {
   background: #5a7af8;
 }
 
@@ -147,8 +179,17 @@ h2 {
   cursor: not-allowed;
 }
 
+.mt-3 {
+  margin-top: 1rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
 p {
   color: #666;
+  margin: 0;
 }
 
 a {
