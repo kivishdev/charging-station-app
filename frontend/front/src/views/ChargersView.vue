@@ -299,6 +299,9 @@ import axios from 'axios';
 import { toast } from 'vue3-toastify';
 import L from 'leaflet';
 
+
+axios.defaults.baseURL=import.meta.env.VUE_APP_API_BASE_URL;
+
 export default {
   name: 'ChargersView',
   data() {

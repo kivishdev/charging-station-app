@@ -52,6 +52,8 @@
 import axios from 'axios';
 import { toast } from 'vue3-toastify';
 
+axios.defaults.baseURL=import.meta.env.VUE_APP_API_BASE_URL;
+
 export default {
   name: 'RegisterView',
   data() {
