@@ -7,7 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
 
 // Use your existing VUE_API_BASE_URL environment variable
-axios.defaults.baseURL = import.meta.env.VUE_APP_API_BASE_URL || 'http://localhost:5000';
+axios.defaults.baseURL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5000';
 
 // CRITICAL: Enable credentials for cross-origin requests
 axios.defaults.withCredentials = true;

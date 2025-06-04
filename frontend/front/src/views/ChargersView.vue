@@ -300,7 +300,7 @@ import { toast } from 'vue3-toastify';
 import L from 'leaflet';
 
 // Fixed base URL with localhost fallback
-axios.defaults.baseURL = import.meta.env.VUE_APP_API_BASE_URL || 'http://localhost:5000';
+axios.defaults.baseURL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5000';
 
 export default {
   name: 'ChargersView',
