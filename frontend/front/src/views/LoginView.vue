@@ -48,7 +48,8 @@
 import axios from 'axios';
 import { toast } from 'vue3-toastify';
 
-axios.defaults.baseURL=import.meta.env.VUE_APP_API_BASE_URL;
+// Flexible base URL configuration with localhost fallback
+axios.defaults.baseURL = import.meta.env.VUE_APP_API_BASE_URL || 'http://localhost:5000';
 
 export default {
   name: 'LoginView',
@@ -61,43 +62,65 @@ export default {
   },
   methods: {
     async login() {
-      // Validate inputs before making request
+      // Prevent multiple submissions
+      if (this.loading) return;
+      
+      // Email format validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+      // Validate inputs
       if (!this.email.trim() || !this.password.trim()) {
         toast.error('Please fill in all fields');
+        return;
+      }
+      
+      // Validate email format
+      if (!emailRegex.test(this.email.trim())) {
+        toast.error('Please enter a valid email address');
         return;
       }
 
       this.loading = true;
       try {
-        const response = await axios.post(`${import.meta.env.VUE_API_BASE_URL}/api/auth/login`, {
-          email: this.email.trim(),
+        console.log('API Base URL:', axios.defaults.baseURL);
+        
+        const response = await axios.post('/api/auth/login', {
+          email: this.email.trim().toLowerCase(), // Normalize email
           password: this.password,
         });
 
-        // Check if response contains token
-        if (response.data && response.data.token) {
-          localStorage.setItem('token', response.data.token);
+        console.log('Login response:', response);
+
+        // Handle different token response formats
+        const token = response.data?.token || 
+                     response.data?.accessToken || 
+                     response.data?.access_token;
+        
+        if (token) {
+          localStorage.setItem('token', token);
           toast.success('Login successful! Redirecting...');
           
-          // Use nextTick to ensure DOM updates before navigation
-          this.$nextTick(() => {
-            setTimeout(() => {
-              this.$router.push('/chargers');
-            }, 1000);
-          });
+          // Redirect after delay
+          setTimeout(() => {
+            this.$router.push('/chargers');
+          }, 1000);
         } else {
-          throw new Error('Invalid response from server');
+          throw new Error('Authentication token missing in response');
         }
       } catch (error) {
-        // Better error handling
-        const errorMessage = error.response?.data?.message || 
-                           error.message || 
-                           'Login failed. Please try again.';
-        toast.error(errorMessage);
+        console.error('Login error:', error);
         
-        // Clear password on error for security
-        this.password = '';
+        // Specific error messages
+        if (error.response?.status === 401) {
+          toast.error('Invalid email or password');
+        } else if (error.response?.data?.message) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.error('Login failed. Please try again.');
+        }
       } finally {
+        // Always clear password for security
+        this.password = '';
         this.loading = false;
       }
     },

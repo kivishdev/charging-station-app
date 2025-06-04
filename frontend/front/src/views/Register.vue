@@ -11,6 +11,10 @@
             class="form-control"
             id="email"
             placeholder="Enter your email"
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
             required
           />
         </div>
@@ -22,6 +26,10 @@
             class="form-control"
             id="password"
             placeholder="Enter your password"
+            autocomplete="new-password"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
             required
             minlength="6"
           />
@@ -34,6 +42,10 @@
             class="form-control"
             id="confirmPassword"
             placeholder="Confirm your password"
+            autocomplete="new-password"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
             required
           />
         </div>
@@ -52,7 +64,8 @@
 import axios from 'axios';
 import { toast } from 'vue3-toastify';
 
-axios.defaults.baseURL=import.meta.env.VUE_APP_API_BASE_URL;
+// Flexible base URL with localhost fallback
+axios.defaults.baseURL = import.meta.env.VUE_APP_API_BASE_URL || 'http://localhost:5000';
 
 export default {
   name: 'RegisterView',
@@ -67,12 +80,12 @@ export default {
   methods: {
     validateForm() {
       // Check if all fields are filled
-      if (!this.email.trim() || !this.password.trim() || !this.confirmPassword.trim()) {
+      if (!this.email.trim() || !this.password || !this.confirmPassword) {
         toast.error('Please fill in all fields');
         return false;
       }
 
-      // Validate email format (basic validation)
+      // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(this.email.trim())) {
         toast.error('Please enter a valid email address');
@@ -95,20 +108,24 @@ export default {
     },
 
     async register() {
+      // Prevent multiple submissions
+      if (this.loading) return;
+      
       // Validate form before proceeding
-      if (!this.validateForm()) {
-        return;
-      }
- 
+      if (!this.validateForm()) return;
+
       this.loading = true;
       try {
-        // Use this instead:
-        const response = await axios.post(`${import.meta.env.VUE_API_BASE_URL}/api/auth/register`, {
-          email: this.email.trim(),
+        console.log('API Base URL:', axios.defaults.baseURL);
+        
+        const response = await axios.post('/api/auth/register', {
+          email: this.email.trim().toLowerCase(), // Normalize email
           password: this.password,
         });
 
-        // Check if registration was successful
+        console.log('Registration response:', response);
+
+        // Handle success (200 or 201 status)
         if (response.status === 200 || response.status === 201) {
           toast.success('Registration successful! Redirecting to login...');
           
@@ -117,25 +134,28 @@ export default {
           this.password = '';
           this.confirmPassword = '';
 
-          this.$nextTick(() => {
-            setTimeout(() => {
-              this.$router.push('/');
-            }, 1500);
-          });
+          // Redirect to login
+          setTimeout(() => {
+            this.$router.push('/');
+          }, 1500);
         } else {
           throw new Error('Registration failed');
         }
       } catch (error) {
-        // Better error handling
-        const errorMessage = error.response?.data?.message || 
-                           error.message || 
-                           'Registration failed. Please try again.';
-        toast.error(errorMessage);
+        console.error('Registration error:', error);
         
-        // Clear passwords on error for security
+        // Specific error messages
+        if (error.response?.status === 400) {
+          toast.error('Email already exists');
+        } else if (error.response?.data?.message) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.error('Registration failed. Please try again.');
+        }
+      } finally {
+        // Always clear passwords for security
         this.password = '';
         this.confirmPassword = '';
-      } finally {
         this.loading = false;
       }
     },

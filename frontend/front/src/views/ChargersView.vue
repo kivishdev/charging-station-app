@@ -299,8 +299,8 @@ import axios from 'axios';
 import { toast } from 'vue3-toastify';
 import L from 'leaflet';
 
-
-axios.defaults.baseURL=import.meta.env.VUE_APP_API_BASE_URL;
+// Fixed base URL with localhost fallback
+axios.defaults.baseURL = import.meta.env.VUE_APP_API_BASE_URL || 'http://localhost:5000';
 
 export default {
   name: 'ChargersView',
@@ -669,7 +669,9 @@ export default {
     async fetchStations() {
       this.loading = true;
       try {
-        const response = await axios.get(`${import.meta.env.VUE_API_BASE_URL}/api/stations`, {
+        console.log('API Base URL:', axios.defaults.baseURL);
+        
+        const response = await axios.get('/api/stations', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -703,7 +705,7 @@ export default {
             longitude: parseFloat(this.newStation.location.longitude),
           },
         };
-        await axios.post(`${import.meta.env.VUE_API_BASE_URL}/api/stations`, stationData, {
+        await axios.post('/api/stations', stationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -747,7 +749,7 @@ export default {
             longitude: parseFloat(this.editingStation.location.longitude),
           },
         };
-        await axios.put(`${import.meta.env.VUE_API_BASE_URL}/api/stations/${this.editingStation._id}`, stationData, {
+        await axios.put(`/api/stations/${this.editingStation._id}`, stationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -775,7 +777,7 @@ export default {
         return;
       }
       try {
-        await axios.delete(`${import.meta.env.VUE_API_BASE_URL}/api/stations/${stationId}`, {
+        await axios.delete(`/api/stations/${stationId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
