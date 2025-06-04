@@ -6,8 +6,11 @@ import 'vue3-toastify/dist/index.css';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
 
-// Set base URL with localhost fallback for development
+// Use your existing VUE_API_BASE_URL environment variable
 axios.defaults.baseURL = import.meta.env.VUE_APP_API_BASE_URL || 'http://localhost:5000';
+
+// CRITICAL: Enable credentials for cross-origin requests
+axios.defaults.withCredentials = true;
 
 const app = createApp(App);
 
@@ -41,3 +44,24 @@ app.config.errorHandler = (err) => {
     toast.error(`Application error: ${err.message}`);
   }
 };
+
+// Add request interceptor to include token in all requests
+axios.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, error => {
+  return Promise.reject(error);
+});
+
+// Add response interceptor to handle 401 errors
+axios.interceptors.response.use(response => response, error => {
+  if (error.response?.status === 401) {
+    localStorage.removeItem('token');
+    router.push('/');
+    app.config.globalProperties.$toast.error('Session expired. Please log in again.');
+  }
+  return Promise.reject(error);
+});

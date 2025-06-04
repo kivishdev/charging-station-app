@@ -33,7 +33,7 @@ if (process.env.NODE_ENV === 'production') {
   // Production CORS
   const allowedOrigins = process.env.ALLOWED_ORIGINS 
     ? process.env.ALLOWED_ORIGINS.split(',') 
-    : ['https://charging-station-app-kle6.onrender.com/','https://charging-front-uejq.onrender.com' , 'http://localhost:5173'];
+    : ['https://charging-station-app-kle6.onrender.com' , 'http://localhost:5173'];
   
   app.use(cors({
     origin: (origin, callback) => {
