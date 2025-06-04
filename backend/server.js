@@ -48,6 +48,7 @@ if (process.env.NODE_ENV === 'production') {
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    maxAge: 86400, // Add OPTIONS preflight caching
     credentials: true
   }));
 } else {
