@@ -1,4 +1,69 @@
-<template>
+.options-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }.options-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #4a5568;
+  position: relative;
+}
+
+.remember-me input[type="checkbox"] {
+  opacity: 0;
+  position: absolute;
+  cursor: pointer;
+}
+
+.checkmark {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e2e8f0;
+  border-radius: 4px;
+  margin-right: 8px;
+  display: inline-block;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.remember-me input:checked + .checkmark {
+  background: #667eea;
+  border-color: #667eea;
+}
+
+.remember-me input:checked + .checkmark::after {
+  content: '✓';
+  position: absolute;
+  color: white;
+  font-size: 12px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.forgot-link {
+  color: #667eea;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.forgot-link:hover {
+  color: #5a67d8;
+  text-decoration: underline;
+}<template>
   <div class="login-container">
     <div class="login-box">
       <div class="login-header">
@@ -9,7 +74,7 @@
         <p class="subtitle">Sign in to your account</p>
       </div>
       
-      <form @submit.prevent="login" autocomplete="off" novalidate>
+      <form @submit.prevent="login" autocomplete="on" novalidate name="loginForm">
         <div class="input-group">
           <label for="email" class="form-label">Email address</label>
           <div class="input-wrapper">
@@ -19,8 +84,9 @@
               type="email"
               class="form-control"
               id="email"
+              name="username"
               placeholder="Enter your email"
-              autocomplete="off"
+              autocomplete="username"
               autocapitalize="off"
               autocorrect="off"
               spellcheck="false"
@@ -31,6 +97,9 @@
         
         <div class="input-group">
           <label for="password" class="form-label">Password</label>
+          <!-- Hidden dummy password field to trick autofill -->
+          <input type="password" style="display: none;" autocomplete="new-password" />
+          
           <div class="input-wrapper">
             <span class="input-icon">🔒</span>
             <input
@@ -38,18 +107,21 @@
               type="password"
               class="form-control"
               id="password"
+              name="password"
               placeholder="Enter your password"
-              autocomplete="new-password"
+              autocomplete="current-password"
               autocapitalize="off"
               autocorrect="off"
               spellcheck="false"
+              @focus="handlePasswordFocus"
+              @input="handlePasswordInput"
               required
             />
           </div>
         </div>
         
 
-        
+
         <button type="submit" class="btn btn-primary" :disabled="loading">
           <span v-if="loading" class="loading-spinner"></span>
           {{ loading ? 'Signing in...' : 'Sign In' }}
@@ -88,9 +160,42 @@ export default {
       email: '',
       password: '',
       loading: false,
+      passwordFocused: false,
     };
   },
+  mounted() {
+    // Simple approach: let username autofill, monitor password
+    this.$nextTick(() => {
+      this.setupPasswordFieldMonitoring();
+    });
+  },
   methods: {
+    setupPasswordFieldMonitoring() {
+      const passwordField = document.getElementById('password');
+      if (passwordField) {
+        // Clear password if it gets autofilled without user interaction
+        setTimeout(() => {
+          if (passwordField.value && !this.passwordFocused && !this.password) {
+            passwordField.value = '';
+            this.password = '';
+          }
+        }, 500);
+      }
+    },
+    
+    handlePasswordFocus() {
+      this.passwordFocused = true;
+      // Allow password manager suggestions when user actively focuses
+    },
+    
+    handlePasswordInput(event) {
+      // Only allow input if user has focused the field
+      if (!this.passwordFocused && event.target.value) {
+        event.target.value = '';
+        this.password = '';
+      }
+    },
+    
     async login() {
       // Prevent multiple submissions
       if (this.loading) return;
@@ -313,7 +418,68 @@ h2 {
   color: #a0aec0;
 }
 
+.options-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
 
+.remember-me {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #4a5568;
+  position: relative;
+}
+
+.remember-me input[type="checkbox"] {
+  opacity: 0;
+  position: absolute;
+  cursor: pointer;
+}
+
+.checkmark {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e2e8f0;
+  border-radius: 4px;
+  margin-right: 8px;
+  display: inline-block;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.remember-me input:checked + .checkmark {
+  background: #667eea;
+  border-color: #667eea;
+}
+
+.remember-me input:checked + .checkmark::after {
+  content: '✓';
+  position: absolute;
+  color: white;
+  font-size: 12px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.forgot-link {
+  color: #667eea;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.forgot-link:hover {
+  color: #5a67d8;
+  text-decoration: underline;
+}
 
 .btn-primary {
   background: linear-gradient(135deg, #667eea, #764ba2);
@@ -432,6 +598,12 @@ h2 {
   
   .btn-primary {
     padding: 14px 20px;
+  }
+  
+  .options-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
   }
 }
 </style>
