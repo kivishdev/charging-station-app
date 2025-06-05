@@ -33,7 +33,10 @@ if (process.env.NODE_ENV === 'production') {
   // Production CORS
   const allowedOrigins = process.env.ALLOWED_ORIGINS 
     ? process.env.ALLOWED_ORIGINS.split(',') 
-    : ['https://charging-front-uejq.onrender.com/','https://charging-station-app-kle6.onrender.com' , 'http://localhost:5173'];
+    : [
+        'https://charging-front-uejq.onrender.com', // Fixed: removed trailing slash
+        'https://charging-station-app-kle6.onrender.com'
+      ];
   
   app.use(cors({
     origin: (origin, callback) => {
@@ -43,17 +46,23 @@ if (process.env.NODE_ENV === 'production') {
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error(`Origin ${origin} not allowed by CORS policy`), false);
+        console.warn(`[CORS] Blocked origin: ${origin}`);
+        callback(new Error(`Origin not allowed by CORS policy`), false);
       }
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    maxAge: 86400, // Add OPTIONS preflight caching
-    credentials: true
+    credentials: true,
+    optionsSuccessStatus: 200 // Handle legacy browsers
   }));
 } else {
-  // Development CORS - allow all
-  app.use(cors());
+  // Development CORS - allow all origins with credentials support
+  app.use(cors({
+    origin: true,  // Dynamically set to requesting origin
+    credentials: true, // Allow credentials
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  }));
 }
 
 // Parse JSON bodies
